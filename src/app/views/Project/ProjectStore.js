@@ -55,7 +55,7 @@ class ProjectStore {
       toast.success("Xóa dự án thành công");
       this.totalElements = this.totalElements - 1;
     } catch (error) {
-      toast.error("Xóa dự án thất bại");
+      toast.error("Xóa thất bại hoặc sản phẩm bị ràng buộc");
     }
   };
 

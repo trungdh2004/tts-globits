@@ -5,6 +5,7 @@ import { pagingCountries } from "../Country/CountryService";
 import { deleteStaff, getAllDepartment, getStaffs } from "./StaffService";
 import { pagingFamilyRelationship } from "../FamilyRelationship/FamilyRelationshipService";
 import { toast } from "react-toastify";
+import { handleGetAll } from "../action";
 
 class StaffStore {
   // call xong lưu store để khi chuyển trang sẽ không bị call api lại
@@ -67,30 +68,6 @@ class StaffStore {
     }
   };
 
-  // handleCreateEthnics = async (value, history) => {
-  //   try {
-  //     const newEthnics = await createEthnics(value);
-  //     toast.success("Thêm sản phẩm thành công");
-  //     history.push("/category/ethnics");
-  //   } catch (error) {
-  //     toast.error("Thêm sản phẩm thất bại");
-  //   }
-  // };
-
-  // handleUpdateEthnics = async (value, history) => {
-  //   try {
-  //     const { data } = await editEthnics(value);
-
-  //     this.ethnicsList = this.ethnicsList.map((ethnics) =>
-  //       ethnics.id === data.id ? data : ethnics
-  //     );
-  //     toast.success("Sửa sản phẩm thành công");
-  //     history.push("/category/ethnics");
-  //   } catch (error) {
-  //     toast.error("Sửa sản phẩm thất bại");
-  //   }
-  // };
-
   handleChangePage = async (event, page) => {
     let obj = {
       pageIndex: page,
@@ -109,49 +86,25 @@ class StaffStore {
 
   //  get all employees
   handleCountryInitial = async () => {
-    const list = await this.handleGetAll(pagingCountries);
+    const list = await handleGetAll(pagingCountries);
     this.countryList = list;
   };
   handleEthnicsInitial = async () => {
-    const list = await this.handleGetAll(pagingEthnicities);
+    const list = await handleGetAll(pagingEthnicities);
     this.ethnicsList = list;
   };
   handleReligionInitial = async () => {
-    const list = await this.handleGetAll(pagingReligions);
+    const list = await handleGetAll(pagingReligions);
     this.religionList = list;
   };
   handleFamilyRelationInitial = async () => {
-    const list = await this.handleGetAll(pagingFamilyRelationship);
+    const list = await handleGetAll(pagingFamilyRelationship);
     this.familyRelationsList = list;
   };
   handleDepartmentListInitial = async () => {
     const { data } = await getAllDepartment();
     console.log(data);
     this.departmentList = data;
-  };
-
-  handleGetAll = async (action) => {
-    try {
-      let list = [];
-      const { data } = await action({
-        pageIndex: 1,
-        pageSize: this.pageSize,
-      });
-      list = list.concat(data.content);
-      if (data.totalPages > 1) {
-        for (let i = 2; i <= data.totalPages; i++) {
-          const { data } = await action({
-            pageIndex: i,
-            pageSize: 20,
-          });
-          list = list.concat(data.content);
-        }
-      }
-
-      return list;
-    } catch (error) {
-      return [];
-    }
   };
 }
 

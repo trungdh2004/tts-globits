@@ -62,7 +62,7 @@ export const createTimeSheet = (body) => {
   return axios.post(url, body);
 };
 
-export const editProject = (obj) => {
+export const editTimeSheet = (obj) => {
   let url = API_PATH + "/" + obj.id;
   return axios.put(url, obj);
 };

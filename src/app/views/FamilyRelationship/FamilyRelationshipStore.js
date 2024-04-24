@@ -57,7 +57,7 @@ class FamilyRelationshipStore {
       toast.success("Xóa thành công");
       this.totalElements = this.totalElements - 1;
     } catch (error) {
-      toast.error("Xóa thất bại");
+      toast.error("Xóa thất bại hoặc sản phẩm bị ràng buộc");
     }
   };
 

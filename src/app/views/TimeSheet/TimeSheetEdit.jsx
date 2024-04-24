@@ -13,7 +13,7 @@ import { getProjectById, pagingProject } from "../Project/ProjectService";
 import { Autocomplete } from "@material-ui/lab";
 import FieldTimeSheetArray from "./components/FieldArrayTime";
 import { toast } from "react-toastify";
-import { createTimeSheet, getTimeSheetById } from "./TimeSheetService";
+import { editTimeSheet, getTimeSheetById } from "./TimeSheetService";
 import { format } from "date-fns";
 
 const hours = [
@@ -187,7 +187,16 @@ const ProjectEdit = observer(({ history, match }) => {
       ),
     }),
     onSubmit: async (values) => {
-      console.log(values);
+      try {
+        const { data } = await editTimeSheet({
+          id: match.params.id,
+          ...values,
+        });
+        toast.success("Chỉnh sửa thành công");
+        history.push("/category/timeSheet");
+      } catch (error) {
+        toast.error("Chỉnh sửa thất bại");
+      }
     },
   });
 

@@ -53,10 +53,10 @@ class CountryStore {
       this.countryList = this.countryList.filter(
         (country) => country.id !== id
       );
-      toast.success("Delete country successfully");
+      toast.success("Xóa thành công");
       this.totalElements = this.totalElements - 1;
     } catch (error) {
-      toast.error("Delete country error");
+      toast.error("Xóa thất bại hoặc sản phẩm bị ràng buộc");
     }
   };
 

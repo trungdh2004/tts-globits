@@ -1,10 +1,9 @@
-import { Button, InputAdornment, makeStyles } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core";
 import GlobitsConfirmationDialog from "app/common/GlobitsConfirmationDialog";
 import { format } from "date-fns";
 import { observer } from "mobx-react";
-import React, { useEffect, useRef, useState } from "react";
-import { getProjectAll, getSearchByPage } from "./TimeSheetService";
-import { TextField } from "@material-ui/core";
+import React, { useEffect, useState } from "react";
+import { getProjectAll } from "./TimeSheetService";
 import GlobitsTable from "app/common/GlobitsTable";
 import SideProject from "./components/SideProject";
 import { useStore } from "app/stores";
@@ -62,7 +61,6 @@ const priorityList = [
 const TimeSheetIndex = observer(({ history }) => {
   const { timeSheetStore } = useStore();
   const classes = useStyles();
-  const [timeSheet, setTimeSheet] = useState([]);
   const [project, setProject] = useState([]);
   const [listProject, setListProject] = useState([]);
   const [projectAction, setProjectAction] = useState("");
