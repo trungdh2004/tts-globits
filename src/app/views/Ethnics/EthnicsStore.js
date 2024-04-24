@@ -54,10 +54,10 @@ class EthnicsStore {
       this.ethnicsList = this.ethnicsList.filter(
         (ethnics) => ethnics.id !== id
       );
-      toast.success("Delete ethnics successfully");
+      toast.success("Xóa thành công");
       this.totalElements = this.totalElements - 1;
     } catch (error) {
-      toast.error("Delete ethnics error");
+      toast.error("Xóa thất bại");
     }
   };
 

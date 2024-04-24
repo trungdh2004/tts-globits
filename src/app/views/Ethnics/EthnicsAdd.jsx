@@ -89,7 +89,7 @@ const EthnicsAdd = ({ history }) => {
           helperText={formik.errors.description}
         />
         <Button type="submit" variant="contained" color="secondary">
-          Create
+          Thêm
         </Button>
       </form>
     </div>

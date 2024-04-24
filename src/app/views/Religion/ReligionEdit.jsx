@@ -105,7 +105,7 @@ export default function ReligionEdit({ match, history }) {
           helperText={formik.errors.description}
         />
         <Button type="submit" variant="contained" color="secondary">
-          Sửa
+          Chỉnh sửa
         </Button>
       </form>
     </div>

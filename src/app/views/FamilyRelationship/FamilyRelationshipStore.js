@@ -54,10 +54,10 @@ class FamilyRelationshipStore {
       this.familyRelationshipList = this.familyRelationshipList.filter(
         (familyRelationship) => familyRelationship.id !== id
       );
-      toast.success("Delete familyRelationship successfully");
+      toast.success("Xóa thành công");
       this.totalElements = this.totalElements - 1;
     } catch (error) {
-      toast.error("Delete familyRelationship error");
+      toast.error("Xóa thất bại");
     }
   };
 

@@ -2,21 +2,16 @@ import { Button } from "@material-ui/core";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import GlobitsTextField from "app/common/form/GlobitsTextField";
 import { useFormik, FormikProvider } from "formik";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import * as Yup from "yup";
 import { Link } from "react-router-dom";
-import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import FormControl from "@material-ui/core/FormControl";
-import Select from "@material-ui/core/Select";
 import GlobitsDateTimePicker from "app/common/form/GlobitsDateTimePicker";
 import { useStore } from "app/stores";
 import { observer } from "mobx-react";
-import TextField from "@material-ui/core/TextField";
 import FieldStaffArray from "./component/FieldArray";
-import { createStaff } from "./StaffService";
+import { createStaff, editStaff, getStaffById } from "./StaffService";
 import { toast } from "react-toastify";
+import { format } from "date-fns";
 import GlobitsSelectInput from "app/common/form/GlobitsSelectInput";
 
 const gender = [
@@ -34,9 +29,9 @@ const gender = [
   },
 ];
 
-const StaffAdd = observer(({ history }) => {
+const StaffEdit = observer(({ history, match }) => {
   const { staffStore } = useStore();
-
+  const [loading, setLoading] = useState(false);
   const formik = useFormik({
     initialValues: {
       lastName: "",
@@ -108,28 +103,20 @@ const StaffAdd = observer(({ history }) => {
           address: Yup.string().required("Required"),
           description: Yup.string().required("Required"),
         })
-        // .shape({
-        //   fullName: Yup.string().required("Required"),
-        //   // profession: Yup.string().required("Required"),
-        //   // birthDate: Yup.string().required("Required"),
-        //   // familyRelationship: Yup.object({
-        //   //   id: Yup.string().required("Required"),
-        //   // }),
-        //   // address: Yup.string().required("Required"),
-        //   // description: Yup.string().required("Required"),
-        // })
       ),
     }),
     onSubmit: async (values) => {
       try {
-        const newStaff = await createStaff({
+        console.log(values);
+        const newStaff = await editStaff({
+          id: match.params.id,
           displayName: `${values.firstName} ${values.lastName}`,
           ...values,
         });
-        toast.success("Tạo nhân viên thành công");
+        toast.success("Chỉnh sửa nhân viên thành công");
         history.push("/category/staff");
       } catch (error) {
-        toast.error("Tạo nhân viên thất bại");
+        toast.error("Chỉnh sửa nhân viên thất bại");
       }
     },
   });
@@ -152,6 +139,53 @@ const StaffAdd = observer(({ history }) => {
     }
   }, []);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await getStaffById(match.params.id);
+        formik.setValues({
+          lastName: data.lastName,
+          firstName: data.firstName,
+          gender: data.gender,
+          birthPlace: data.birthPlace,
+          permanentResidence: data.permanentResidence,
+          currentResidence: data.currentResidence,
+          email: data.email,
+          phoneNumber: data.phoneNumber,
+          idNumber: data.idNumber,
+          birthDate: format(new Date(data.birthDate), "yyyy-MM-dd"),
+          nationality: {
+            id: data.nationality.id,
+          },
+          ethnics: {
+            id: data.ethnics.id,
+          },
+          religion: {
+            id: data.religion.id,
+          },
+          department: {
+            id: data.department.id,
+          },
+          familyRelationships: data.familyRelationships.map((item) => ({
+            fullName: item.fullName,
+            profession: item.profession,
+            birthDate: format(new Date(item.birthDate), "yyyy-MM-dd"),
+            familyRelationship: {
+              id: item.familyRelationship.id,
+            },
+            address: item.address,
+            description: item.description,
+          })),
+        });
+        setLoading(true);
+      } catch (error) {}
+    })();
+  }, []);
+
+  if (!loading) {
+    return null;
+  }
+
   return (
     <div
       style={{
@@ -168,7 +202,7 @@ const StaffAdd = observer(({ history }) => {
           alignItems: "center",
         }}
       >
-        <h2>Tạo phòng ban</h2>
+        <h2>Sửa nhân viên</h2>
         <Link to="/category/department">
           <Button color="secondary" variant="outlined">
             Danh sách nhân viên
@@ -220,18 +254,19 @@ const StaffAdd = observer(({ history }) => {
           />
 
           {/* //todo: gender ======================== */}
-          <GlobitsSelectInput
-            nameValue="title"
-            keyValue={"value"}
-            options={gender}
-            label="Giới tính"
-            name={"gender"}
-            id={"gender"}
-            value={formik.values.gender}
-            handleChange={formik.handleChange}
-            error={formik.errors.gender}
-            helperText={formik.errors.gender}
-          />
+          <>
+            <GlobitsSelectInput
+              nameValue="title"
+              keyValue={"value"}
+              options={gender}
+              name={"gender"}
+              id={"gender"}
+              value={formik.values.gender}
+              handleChange={formik.handleChange}
+              defaultValue={formik.values.gender}
+            />
+          </>
+
           {/* //todo: birthDate ======================== */}
           <GlobitsDateTimePicker
             name="birthDate"
@@ -317,35 +352,36 @@ const StaffAdd = observer(({ history }) => {
           >
             {/* //todo: country ======================== */}
 
-            <GlobitsSelectInput
-              nameValue="name"
-              keyValue={"id"}
-              options={staffStore.countryList}
-              label="Quốc tịch"
-              name={"nationality"}
-              id={"nationality"}
-              handleChange={(e) => {
-                formik.setFieldValue("nationality.id", e.target.value);
-              }}
-              error={formik.errors.nationality?.id}
-              helperText={formik.errors.nationality?.id}
-            />
-
+            <>
+              <GlobitsSelectInput
+                nameValue="name"
+                keyValue={"id"}
+                options={staffStore.countryList}
+                name={"nationality"}
+                id={"nationality"}
+                handleChange={(e) => {
+                  formik.setFieldValue("nationality.id", e.target.value);
+                }}
+                defaultValue={formik.values.nationality.id}
+                error={formik.errors.nationality?.id}
+                helperText={formik.errors.nationality?.id}
+              />
+            </>
             {/* //todo: ethnics ======================== */}
 
-            <GlobitsSelectInput
-              nameValue="name"
-              keyValue={"id"}
-              options={staffStore.ethnicsList}
-              name={"ethnics"}
-              id={"ethnics"}
-              handleChange={(e) => {
-                formik.setFieldValue("ethnics.id", e.target.value);
-              }}
-              label="Dân tộc"
-              error={formik.errors.ethnics?.id}
-              helperText={formik.errors.ethnics?.id}
-            />
+            <>
+              <GlobitsSelectInput
+                nameValue="name"
+                keyValue={"id"}
+                options={staffStore.ethnicsList}
+                name={"ethnics"}
+                id={"ethnics"}
+                handleChange={(e) => {
+                  formik.setFieldValue("ethnics.id", e.target.value);
+                }}
+                defaultValue={formik.values.ethnics.id}
+              />
+            </>
           </div>
           <div
             style={{
@@ -357,37 +393,38 @@ const StaffAdd = observer(({ history }) => {
           >
             {/* //todo: religion ======================== */}
 
-            <GlobitsSelectInput
-              nameValue="name"
-              keyValue={"id"}
-              options={staffStore.religionList}
-              name={"religion"}
-              id={"religion"}
-              handleChange={(e) => {
-                formik.setFieldValue("religion.id", e.target.value);
-              }}
-              label="Tôn giáo "
-              error={formik.errors.religion?.id}
-              helperText={formik.errors.religion?.id}
-            />
-
+            <>
+              <GlobitsSelectInput
+                nameValue="name"
+                keyValue={"id"}
+                options={staffStore.religionList}
+                name={"religion"}
+                id={"religion"}
+                handleChange={(e) => {
+                  formik.setFieldValue("religion.id", e.target.value);
+                }}
+                defaultValue={formik.values.religion.id}
+              />
+            </>
             {/* //todo: departmentList ======================== */}
-            <GlobitsSelectInput
-              nameValue="text"
-              keyValue={"id"}
-              options={staffStore.departmentList}
-              name={"department"}
-              id={"department"}
-              handleChange={(e) => {
-                formik.setFieldValue("department.id", e.target.value);
-              }}
-              label="Phòng ban"
-              error={formik.errors.department?.id}
-              helperText={formik.errors.department?.id}
-            />
+
+            <>
+              <GlobitsSelectInput
+                nameValue="text"
+                keyValue={"id"}
+                options={staffStore.departmentList}
+                name={"department"}
+                id={"department"}
+                handleChange={(e) => {
+                  formik.setFieldValue("department.id", e.target.value);
+                }}
+                defaultValue={formik.values.department.id}
+              />
+            </>
           </div>
 
           {/*  */}
+
           <FieldStaffArray
             formik={formik}
             familyRelationData={staffStore.familyRelationsList}
@@ -401,7 +438,7 @@ const StaffAdd = observer(({ history }) => {
               color: "white",
             }}
           >
-            Thêm nhân viên
+            Chỉnh sửa
           </Button>
         </form>
       </FormikProvider>
@@ -409,4 +446,4 @@ const StaffAdd = observer(({ history }) => {
   );
 });
 
-export default StaffAdd;
+export default StaffEdit;

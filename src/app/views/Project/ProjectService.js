@@ -12,8 +12,9 @@ const API_PATH_2 = ConstantList.API_ENPOINT + "/api/hrProject";
 //   }
 // ]
 
+
 export const pagingProject = (obj) => {
-  var url = API_PATH_2 + "/search-by-page";
+  var url = API_PATH + "/search-by-page";
   return axios.post(url, obj);
 };
 
@@ -37,16 +38,16 @@ export const createProject = (body) => {
   // ]
   // };
 
-  let url = API_PATH_2;
+  let url = API_PATH;
   return axios.post(url, body);
 };
 
 export const editProject = (obj) => {
-  let url = API_PATH_2 + "/" + obj.id;
+  let url = API_PATH + "/" + obj.id;
   return axios.put(url, obj);
 };
 
 export const deleteProject = (id) => {
-  let url = API_PATH_2 + "/" + id;
+  let url = API_PATH + "/" + id;
   return axios.delete(url);
 };

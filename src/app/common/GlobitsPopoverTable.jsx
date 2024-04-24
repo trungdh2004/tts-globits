@@ -40,6 +40,8 @@ const GlobitsPopoverTable = (props) => {
     select,
     setSelect,
     handleSubmit,
+    selection,
+    
   } = props;
 
   // click close popover
@@ -49,7 +51,9 @@ const GlobitsPopoverTable = (props) => {
 
   const handleClose = () => {
     setAnchorEl(null);
-    setSelect(null);
+    if (setSelect) {
+      setSelect(null);
+    }
   };
 
   // todo
@@ -117,7 +121,7 @@ const GlobitsPopoverTable = (props) => {
                 data={data}
                 columns={columns}
                 handleSelectList={handleSelectList}
-                selection={false}
+                selection={selection || false}
                 totalPages={totalPages}
                 handleChangePage={handleChangePage}
                 setRowsPerPage={setPageSize}
@@ -128,6 +132,7 @@ const GlobitsPopoverTable = (props) => {
                 maxHeight="350"
                 isPagesizeSelect
                 title=" "
+                
               />
             </div>
 
@@ -144,7 +149,6 @@ const GlobitsPopoverTable = (props) => {
               <Button
                 variant="contained"
                 color="primary"
-                disabled={!select}
                 onClick={() => {
                   handleClose();
                   handleSubmit();

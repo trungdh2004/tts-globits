@@ -6,6 +6,9 @@ const StaffIndex = EgretLoadable({
 const StaffAdd = EgretLoadable({
   loader: () => import("./StaffAdd"),
 });
+const StaffEdit = EgretLoadable({
+  loader: () => import("./StaffEdit"),
+});
 
 const Routes = [
   {
@@ -17,6 +20,11 @@ const Routes = [
     path: ConstantList.ROOT_PATH + "category/staff/add",
     exact: true,
     component: StaffAdd,
+  },
+  {
+    path: ConstantList.ROOT_PATH + "category/staff/edit/:id",
+    exact: true,
+    component: StaffEdit,
   },
 ];
 

@@ -8,18 +8,20 @@ import GlobitsPopoverTable from "app/common/GlobitsPopoverTable";
 import { format } from "date-fns";
 import {
   createDepartment,
+  editDepartment,
   getDepartment,
   pagingDepartments,
 } from "./DepartmentService";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
+import { observer } from "mobx-react";
 
 const DepartmentEdit = ({ match, history }) => {
   const [date, setDate] = useState();
   const formik = useFormik({
     initialValues: {
       parentName: "",
-      id: "",
+      idParent: "",
       name: "",
       code: "",
       description: "",
@@ -31,7 +33,7 @@ const DepartmentEdit = ({ match, history }) => {
     },
     validationSchema: Yup.object({
       parentName: Yup.string(),
-      id: Yup.string(),
+      idParent: Yup.string(),
       name: Yup.string().required("Bạn chưa nhập tên!"),
       code: Yup.string().required("Bạn chưa nhập mã!!"),
       description: Yup.string().required("Bạn chưa nhập mô tả!!"),
@@ -43,9 +45,22 @@ const DepartmentEdit = ({ match, history }) => {
     }),
     onSubmit: async (values) => {
       try {
-        console.log(values);
+        const { idParent, parentName, ...orther } = values;
+
+        const body = {
+          parent: {
+            id: idParent || null,
+          },
+          ...orther,
+        };
+        await editDepartment({
+          id: match.params.id,
+          ...body,
+        });
+        toast.success("Chỉnh sửa phòng ban thành công");
+        history.push("/category/department");
       } catch (error) {
-        console.log(error);
+        toast.error("Chỉnh sửa phòng ban thất bại");
       }
     },
   });
@@ -54,7 +69,7 @@ const DepartmentEdit = ({ match, history }) => {
   const [totalPages, setTotalPages] = useState(0);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
-  const [openDelete, setOpenDelete] = useState(false);
+
   const [select, setSelect] = useState(null);
 
   useEffect(() => {
@@ -81,7 +96,7 @@ const DepartmentEdit = ({ match, history }) => {
         console.log("body:", format(new Date(data.foundedDate), "yyyy-MM-dd"));
         formik.setValues({
           parentName: data.parent?.name || "",
-          id: data.parent?.id || "",
+          idParent: data.parent?.id || "",
           name: data.name,
           code: data.code,
           description: data.description,
@@ -93,7 +108,7 @@ const DepartmentEdit = ({ match, history }) => {
         });
       } catch (error) {
         console.log(error);
-        // history.push("/category/department");
+        history.push("/category/department");
       }
     })();
   }, []);
@@ -149,7 +164,7 @@ const DepartmentEdit = ({ match, history }) => {
   const handleSubmit = () => {
     const parent = data.find((item) => item.id === select);
 
-    formik.setFieldValue("id", parent.id);
+    formik.setFieldValue("idParent", parent.id);
     formik.setFieldValue("parentName", parent.name);
   };
 
@@ -316,7 +331,7 @@ const DepartmentEdit = ({ match, history }) => {
           helperText={formik.errors.displayOrder}
         />
         <Button type="submit" variant="contained" color="secondary">
-          Create
+          Chỉnh sửa
         </Button>
       </form>
     </div>

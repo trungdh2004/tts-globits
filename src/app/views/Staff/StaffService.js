@@ -21,14 +21,14 @@ const API_PATH_2 = ConstantList.API_ENPOINT + "/api/hrStaff";
 // - familyRelationships<Array[StaffFamilyRelationship]>
 
 export const getAllDepartment = (searchObject) => {
-  var url = API_PATH_2 + "/departmenttree";
-  return axios.post(url, searchObject);
+  var url = API_PATH + "/departmenttree";
+  return axios.get(url, searchObject);
 };
 
 // get staff theo từng pages
-export const getStaffs = ({ pageIndex, pageSize }) => {
-  let url = `${API_PATH}/${pageIndex}/${pageSize}`;
-  return axios.get(url);
+export const getStaffs = (obj) => {
+  let url = `${API_PATH}/searchByPage`;
+  return axios.post(url, obj);
 };
 
 export const getStaffById = (id) => {
@@ -73,17 +73,17 @@ export const createStaff = (body) => {
   //   ],
   // };
 
-  let url = API_PATH_2;
+  let url = API_PATH;
   return axios.post(url, body);
 };
 
 export const editStaff = (obj) => {
-  let url = API_PATH_2 + "/" + obj.id;
+  let url = API_PATH + "/" + obj.id;
   return axios.put(url, obj);
 };
 
 export const deleteStaff = (id) => {
-  let url = API_PATH_2 + "/" + id;
+  let url = API_PATH + "/" + id;
   return axios.delete(url);
 };
 
@@ -113,5 +113,3 @@ export const getFindStaffs = ({ pageIndex, pageSize, ...obj }) => {
   let url = `${API_PATH}/${pageIndex}/${pageSize}`;
   return axios.post(url, obj);
 };
-
-

@@ -104,7 +104,7 @@ export default function CountryDetail({ match, history }) {
           helperText={formik.errors.description}
         />
         <Button type="submit" variant="contained" color="secondary">
-          Update
+          Chỉnh sửa
         </Button>
       </form>
     </div>

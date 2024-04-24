@@ -55,10 +55,10 @@ class ReligionStore {
       this.religionList = this.religionList.filter(
         (religion) => religion.id !== id
       );
-      toast.success("Delete religion successfully");
+      toast.success("Xóa thành công");
       this.totalElements = this.totalElements - 1;
     } catch (error) {
-      toast.error("Delete religion error");
+      toast.error("Xóa thất bại");
     }
   };
 

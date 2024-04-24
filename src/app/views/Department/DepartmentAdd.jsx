@@ -56,6 +56,7 @@ const DepartmentAdd = ({ history }) => {
         history.push("/category/department");
       } catch (error) {
         console.log(error);
+        toast.error("Tạo thất bại");
       }
     },
   });
@@ -303,7 +304,7 @@ const DepartmentAdd = ({ history }) => {
           helperText={formik.errors.displayOrder}
         />
         <Button type="submit" variant="contained" color="secondary">
-          Create
+          Thêm
         </Button>
       </form>
     </div>

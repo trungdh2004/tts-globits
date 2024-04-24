@@ -31,6 +31,7 @@ export default function GlobitsTable(props) {
     actions,
     maxHeight,
     isPagesizeSelect,
+    isNotSearch,
   } = props;
 
   return (
@@ -45,9 +46,10 @@ export default function GlobitsTable(props) {
         }}
         options={{
           selection: selection ? true : false,
+
           actionsColumnIndex: -1,
           paging: false,
-          search: true,
+          search: isNotSearch ? isNotSearch : true,
           toolbar: true,
           maxBodyHeight: maxHeight ? maxHeight : "400px",
           headerStyle: {
@@ -55,6 +57,7 @@ export default function GlobitsTable(props) {
             // color: "#fff",
             position: "sticky",
           },
+
           rowStyle: (rowData, index) => {
             return {
               backgroundColor: index % 2 === 1 ? "rgb(237, 245, 251)" : "#FFF",
@@ -71,7 +74,6 @@ export default function GlobitsTable(props) {
           },
         }}
         actions={actions}
-        
       />
       <GlobitsPagination
         totalPages={totalPages}

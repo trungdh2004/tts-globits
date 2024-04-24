@@ -3,28 +3,17 @@ import { deleteDepartment, pagingAllDepartments } from "./DepartmentService";
 import GlobitsTable from "app/common/GlobitsTable";
 import GlobitsConfirmationDialog from "app/common/GlobitsConfirmationDialog";
 import { toast } from "react-toastify";
+import { useStore } from "app/stores";
+import { observer } from "mobx-react";
 
-const DepartmentIndex = ({ history }) => {
-  const [data, setData] = useState([]);
-  const [totalElements, setTotalElements] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
+const DepartmentIndex = observer(({ history }) => {
+  const { departmentStore } = useStore();
+
   const [openDelete, setOpenDelete] = useState(false);
   const [idDelete, setIdDelete] = useState(null);
   useEffect(() => {
-    (async () => {
-      let searchObject = {
-        pageIndex: 1,
-        pageSize: pageSize,
-      };
-      let data = await pagingAllDepartments(searchObject);
-      setData(data.data.content);
-      setTotalElements(data.data.totalElements);
-      setTotalPages(data.data.totalPages);
-      setPage(data.data.number + 1);
-    })();
-  }, [pageSize]);
+    departmentStore.handleDepartmentListInitial();
+  }, []);
 
   const columns = [
     {
@@ -78,34 +67,11 @@ const DepartmentIndex = ({ history }) => {
 
   const pageSizeOption = [5, 10, 15, 20];
 
-  const handleChangePage = async (event, page) => {
-    let searchObject = {
-      pageIndex: page,
-      pageSize: pageSize,
-    };
-    let data = await pagingAllDepartments(searchObject);
-    setData(data);
-    setPage(data.data.number + 1);
-  };
-
   const handleSelectList = () => {};
   const handleDelete = async () => {
-    try {
-      try {
-        if (!idDelete) throw new Error();
-        await deleteDepartment(idDelete);
-        setData((prev) => {
-          return prev.filter((item) => item.id !== idDelete);
-        });
-        toast.success("Delete country successfully");
-        setOpenDelete(false);
-        setIdDelete(null);
-      } catch (error) {
-        toast.error("Delete country error");
-      }
-    } catch (error) {
-      alert("Delete country error");
-    }
+    await departmentStore.handleDeleteDepartmentsById(idDelete);
+    setOpenDelete(false);
+    setIdDelete(null);
   };
   return (
     <div>
@@ -115,18 +81,17 @@ const DepartmentIndex = ({ history }) => {
         }}
       >
         <GlobitsTable
-          data={data}
+          data={departmentStore.departmentList}
           columns={columns}
           handleSelectList={handleSelectList}
           selection={false}
-          totalPages={totalPages}
-          handleChangePage={handleChangePage}
-          setRowsPerPage={setPageSize}
-          pageSize={pageSize}
+          totalPages={departmentStore.totalPages}
+          handleChangePage={departmentStore.handleChangePage}
+          setRowsPerPage={departmentStore.handlePageSize}
+          pageSize={departmentStore.pageSize}
           pageSizeOption={pageSizeOption}
-          totalElements={totalElements}
-          page={page}
-          maxHeight="600px"
+          totalElements={departmentStore.totalElements}
+          page={departmentStore.page}
           title="Danh sách phòng ban"
           actions={actions}
         />
@@ -145,6 +110,6 @@ const DepartmentIndex = ({ history }) => {
       />
     </div>
   );
-};
+});
 
 export default DepartmentIndex;
