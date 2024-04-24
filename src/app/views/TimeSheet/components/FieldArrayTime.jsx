@@ -87,6 +87,16 @@ const FieldTimeSheetArray = (props) => {
                         e.target.value
                       );
                     }}
+                    error={
+                      (formik.errors?.details &&
+                        formik.errors?.details[index]?.employee.id) ||
+                      false
+                    }
+                    helperText={
+                      (formik.errors?.details &&
+                        formik.errors?.details[index]?.employee.id) ||
+                      ""
+                    }
                   />
                 </div>
                 {formik.values.details.length >= 2 && (

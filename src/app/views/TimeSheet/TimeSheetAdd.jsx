@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 import { observer } from "mobx-react";
 import GlobitsSelectInput from "app/common/form/GlobitsSelectInput";
 import GlobitsDateTimePicker from "app/common/form/GlobitsDateTimePicker";
-import { handleGetAll } from "../action";
+import { getTime, handleGetAll } from "../action";
 import { pagingProject } from "../Project/ProjectService";
 import { Autocomplete } from "@material-ui/lab";
 import FieldTimeSheetArray from "./components/FieldArrayTime";
@@ -183,8 +183,14 @@ const ProjectAdd = observer(({ history }) => {
       ),
     }),
     onSubmit: async (values) => {
+      const startTime = `${values.workingDate}T${values.startTime}:00`;
+      const endTime = `${values.workingDate}T${values.endTime}:00`;
       try {
-        const { data } = await createTimeSheet(values);
+        const { data } = await createTimeSheet({
+          ...values,
+          startTime: getTime(startTime),
+          endTime: getTime(endTime),
+        });
         toast.success("Bạn tạo thành công");
         history.push("/category/timeSheet");
       } catch (error) {
@@ -196,6 +202,7 @@ const ProjectAdd = observer(({ history }) => {
   const [projectList, setProjectList] = useState([]);
   const [staffList, setStaffList] = useState([]);
   const [sheetStaff, setSheetStaff] = useState([]);
+  const [maxTime, setMaxTiem] = useState([]);
 
   useEffect(() => {
     (async () => {
@@ -333,16 +340,20 @@ const ProjectAdd = observer(({ history }) => {
               name={"startTime"}
               id={"startTime"}
               values={formik.values.startTime}
-              handleChange={formik.handleChange}
+              handleChange={(e) => {
+                formik.handleChange(e);
+                setMaxTiem(hours.filter((item) => item.name > e.target.value));
+              }}
               error={formik.errors.startTime}
             />
             <GlobitsSelectInput
               nameValue="name"
               keyValue={"name"}
               label="Giờ kết thúc"
-              options={hours}
+              options={maxTime}
               name={"endTime"}
               id={"endTime"}
+              disabled={!maxTime.length}
               values={formik.values.endTime}
               handleChange={formik.handleChange}
               error={formik.errors.endTime}

@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 import { observer } from "mobx-react";
 import GlobitsSelectInput from "app/common/form/GlobitsSelectInput";
 import GlobitsDateTimePicker from "app/common/form/GlobitsDateTimePicker";
-import { handleGetAll } from "../action";
+import { getTime, handleGetAll } from "../action";
 import { getProjectById, pagingProject } from "../Project/ProjectService";
 import { Autocomplete } from "@material-ui/lab";
 import FieldTimeSheetArray from "./components/FieldArrayTime";
@@ -18,37 +18,37 @@ import { format } from "date-fns";
 
 const hours = [
   {
-    name: "0",
+    name: "01",
   },
   {
-    name: "1",
+    name: "02",
   },
   {
-    name: "2",
+    name: "03",
   },
   {
-    name: "3",
+    name: "04",
   },
   {
-    name: "4",
+    name: "05",
   },
   {
-    name: "5",
+    name: "06",
   },
   {
-    name: "6",
+    name: "07",
   },
   {
-    name: "7",
+    name: "08",
   },
   {
-    name: "8",
-  },
-  {
-    name: "9",
+    name: "09",
   },
   {
     name: "10",
+  },
+  {
+    name: "11",
   },
   {
     name: "12",
@@ -187,10 +187,15 @@ const ProjectEdit = observer(({ history, match }) => {
       ),
     }),
     onSubmit: async (values) => {
+      const startTime = `${values.workingDate}T${values.startTime}:00`;
+      const endTime = `${values.workingDate}T${values.endTime}:00`;
+
       try {
         const { data } = await editTimeSheet({
-          id: match.params.id,
           ...values,
+          id: match.params.id,
+          startTime: getTime(startTime),
+          endTime: getTime(endTime),
         });
         toast.success("Chỉnh sửa thành công");
         history.push("/category/timeSheet");
@@ -203,6 +208,7 @@ const ProjectEdit = observer(({ history, match }) => {
   const [projectList, setProjectList] = useState([]);
   const [staffList, setStaffList] = useState([]);
   const [sheetStaff, setSheetStaff] = useState([]);
+  const [maxTime, setMaxTime] = useState([]);
 
   const [loading, setLoading] = useState(false);
   useEffect(() => {
@@ -216,8 +222,8 @@ const ProjectEdit = observer(({ history, match }) => {
       const { data } = await getTimeSheetById(match.params.id);
       formik.setValues({
         priority: data.priority,
-        startTime: data.startTime + "",
-        endTime: data.endTime + "",
+        startTime: format(new Date(data.startTime), "HH"),
+        endTime: format(new Date(data.endTime), "HH"),
         workingDate: format(new Date(data.workingDate), "yyyy-MM-dd"),
         project: {
           id: data.project.id,
@@ -238,6 +244,11 @@ const ProjectEdit = observer(({ history, match }) => {
       setStaffList(staffProject.data.projectStaff);
       setSheetStaff(data.timeSheetStaff);
       setLoading(true);
+      setMaxTime(
+        hours.filter(
+          (item) => item.name > format(new Date(data.startTime), "HH")
+        )
+      );
     })();
   }, []);
 
@@ -387,16 +398,20 @@ const ProjectEdit = observer(({ history, match }) => {
               name={"startTime"}
               id={"startTime"}
               value={formik.values.startTime}
-              handleChange={formik.handleChange}
+              handleChange={(e) => {
+                formik.handleChange(e);
+                setMaxTime(hours.filter((item) => item.name > e.target.value));
+              }}
               error={formik.errors.startTime}
             />
             <GlobitsSelectInput
               nameValue="name"
               keyValue={"name"}
               label="Giờ kết thúc"
-              options={hours}
+              options={maxTime}
               name={"endTime"}
               id={"endTime"}
+              disabled={!maxTime}
               value={formik.values.endTime}
               handleChange={formik.handleChange}
               error={formik.errors.endTime}

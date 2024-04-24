@@ -1,6 +1,6 @@
 import { makeStyles } from "@material-ui/core";
 import GlobitsConfirmationDialog from "app/common/GlobitsConfirmationDialog";
-import { format } from "date-fns";
+import { format, getTime } from "date-fns";
 import { observer } from "mobx-react";
 import React, { useEffect, useState } from "react";
 import { getProjectAll } from "./TimeSheetService";
@@ -118,37 +118,61 @@ const TimeSheetIndex = observer(({ history }) => {
       field: "date",
       title: "Thời gian ",
       render: (rowData) => {
-        const date = format(new Date(rowData.workingDate), "yyyy-MM-dd");
+        const startTime = format(
+          new Date(rowData.startTime),
+          "HH:mm yyyy-MM-dd"
+        );
+        const endTime = format(new Date(rowData.endTime), "HH:mm yyyy-MM-dd");
+        const timeOne = format(new Date(rowData.startTime), "HH");
+        const timeTwo = format(new Date(rowData.endTime), "HH");
+        const totalTime = +timeTwo - +timeOne;
         return (
           <ul
             style={{
               padding: 0,
+              listStyle: "none",
             }}
           >
-            <li>
+            <li
+              style={{
+                fontSize: "12px",
+              }}
+            >
               Thời gian bắt đầu :{" "}
               <span
                 style={{
                   color: "#01c0c8",
                 }}
-              >{`${rowData.startTime} ${date}`}</span>
+              >
+                {startTime}
+              </span>
             </li>
-            <li>
+            <li
+              style={{
+                fontSize: "12px",
+              }}
+            >
               Thời gian kêt thúc :{" "}
               <span
                 style={{
                   color: "#01c0c8",
                 }}
-              >{`${rowData.endTime} ${date}`}</span>
+              >
+                {endTime}
+              </span>
             </li>
-            <li>
-              Tổng :{" "}
+            <li
+              style={{
+                fontSize: "12px",
+              }}
+            >
+              Tổng thời gian:{" "}
               <span
                 style={{
                   color: "#01c0c8",
                 }}
               >
-                {rowData.endTime - rowData.startTime}
+                {totalTime} tiếng
               </span>
             </li>
           </ul>
@@ -283,7 +307,6 @@ const TimeSheetIndex = observer(({ history }) => {
             isNotSearch
           />
         </div>
-        {idDelete}
 
         <GlobitsConfirmationDialog
           open={openDelete}

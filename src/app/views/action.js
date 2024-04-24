@@ -21,3 +21,7 @@ export const handleGetAll = async (action, pageSize) => {
     return [];
   }
 };
+
+export const getTime = (time) => {
+  return new Date(time).getTime();
+};
